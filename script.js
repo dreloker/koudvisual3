@@ -1,13 +1,12 @@
 // ============================================================
-//  IMAGE ROTATOR – hero aleatorio + proyectos sin repetición
+//  KOUD – script principal
 // ============================================================
 
 const IMAGES = Array.from({ length: 12 }, (_, i) => `img/proyecto${i + 1}.jpg`);
-const PROJECT_SLOTS = 4;
-const PROJECT_INTERVAL_MS = 4000; // cada 4 s cambia una tarjeta
+const HERO_INTERVAL_MS = 5000;
+const BLOCK_COUNT = 60;
 
 // ── Utilidades ──────────────────────────────────────────────
-
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -17,61 +16,173 @@ function shuffle(arr) {
   return a;
 }
 
-function pickRandom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+// ── HERO ────────────────────────────────────────────────────
+let heroPool = [];
+let heroAnimating = false;
+let heroAutoplay = null;
+
+function refillHeroPool() {
+  heroPool = shuffle([...IMAGES]);
 }
 
-// ── HERO: imagen aleatoria al cargar ────────────────────────
-
-function initHero() {
-  const img = document.querySelector('.hero__media img');
-  if (!img) return;
-  img.src = pickRandom(IMAGES);
+function drawFromHeroPool() {
+  if (heroPool.length === 0) refillHeroPool();
+  return heroPool.pop();
 }
 
-// ── PROYECTOS: pozo compartido sin repetición ───────────────
+function createHeroSlide(imageSrc) {
+  const slide = document.createElement('div');
+  slide.className = 'hero-slide';
+  slide.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
 
-let pool = [];       // imágenes que quedan por mostrar
-let usedBySlot = []; // imagen actual de cada slot
+  const sliderW = document.getElementById('hero-slider').offsetWidth;
+  const blockW  = sliderW / BLOCK_COUNT;
 
-function refillPool() {
-  // Excluye las 4 imágenes que ya están visibles
-  const visible = new Set(usedBySlot);
-  const candidates = IMAGES.filter(img => !visible.has(img));
-  pool = shuffle(candidates.length >= PROJECT_SLOTS ? candidates : IMAGES);
+  for (let i = 0; i < BLOCK_COUNT; i++) {
+    const left = i * blockW;
+
+    const l3 = document.createElement('div');
+    l3.className = 'hb-layer3';
+    l3.style.cssText = `position:absolute;top:0;left:${left}px;width:${blockW}px;height:100%;background:#000;z-index:1;`;
+    slide.appendChild(l3);
+
+    const l2 = document.createElement('div');
+    l2.className = 'hb-layer2';
+    l2.style.cssText = `position:absolute;top:0;left:${left}px;width:${blockW}px;height:100%;background:#86EAC2;z-index:2;`;
+    slide.appendChild(l2);
+
+    const l1 = document.createElement('div');
+    l1.className = 'hb-layer1';
+    l1.style.cssText = `position:absolute;top:0;left:${left}px;width:${blockW}px;height:100%;overflow:hidden;z-index:3;`;
+
+    const img = document.createElement('img');
+    img.src = imageSrc;
+    img.style.cssText = `
+      position:absolute;
+      top:0;
+      left:${-left}px;
+      width:${sliderW}px;
+      height:100%;
+      object-fit:cover;
+    `;
+    l1.appendChild(img);
+    slide.appendChild(l1);
+  }
+
+  return slide;
 }
 
-function drawFromPool() {
-  if (pool.length === 0) refillPool();
-  return pool.pop();
-}
+function heroTransition(incoming) {
+  if (heroAnimating) return;
+  heroAnimating = true;
 
-function initProjects() {
-  const figures = document.querySelectorAll('.projects__item img');
-  if (!figures.length) return;
+  const sliderEl = document.getElementById('hero-slider');
+  const oldSlide = sliderEl.querySelector('.hero-slide');
+  const newSlide = createHeroSlide(incoming);
+  sliderEl.appendChild(newSlide);
 
-  // Reparte las primeras 4 imágenes (sin repetir)
-  refillPool();
-  figures.forEach((img, i) => {
-    const src = drawFromPool();
-    usedBySlot[i] = src;
-    img.src = src;
+  const l1o = oldSlide.querySelectorAll('.hb-layer1');
+  const l2o = oldSlide.querySelectorAll('.hb-layer2');
+  const l3o = oldSlide.querySelectorAll('.hb-layer3');
+
+  gsap.to(l1o, { scaleY: 0, transformOrigin: 'bottom center', duration: 0.5, ease: 'power2.in', stagger: 0.05 });
+  gsap.to(l2o, { scaleY: 0, transformOrigin: 'bottom center', duration: 0.6, ease: 'power2.in', stagger: 0.05, delay: 0.2 });
+  gsap.to(l3o, { scaleY: 0, transformOrigin: 'bottom center', duration: 0.6, ease: 'power2.in', stagger: 0.05, delay: 0.5,
+    onComplete: () => oldSlide.remove()
   });
 
-  // Ciclo: cada intervalo reemplaza UNA tarjeta aleatoria
-  setInterval(() => {
-    const figures = document.querySelectorAll('.projects__item img');
-    const slotIndex = Math.floor(Math.random() * PROJECT_SLOTS);
-    const newSrc = drawFromPool();
+  const l1n = newSlide.querySelectorAll('.hb-layer1');
+  const l2n = newSlide.querySelectorAll('.hb-layer2');
+  const l3n = newSlide.querySelectorAll('.hb-layer3');
 
-    usedBySlot[slotIndex] = newSrc;
-    figures[slotIndex].src = newSrc;
-  }, PROJECT_INTERVAL_MS);
+  gsap.set([l1n, l2n, l3n], { scaleY: 0, transformOrigin: 'bottom center' });
+  gsap.to([l1n, l2n, l3n], {
+    scaleY: 1,
+    duration: 0.7,
+    ease: 'power3.out',
+    stagger: 0.05,
+    delay: 0.3,
+    onComplete: () => { heroAnimating = false; }
+  });
 }
 
-// ── Init ────────────────────────────────────────────────────
+function initHero() {
+  const sliderEl = document.getElementById('hero-slider');
+  if (!sliderEl) return;
 
+  refillHeroPool();
+
+  requestAnimationFrame(() => {
+    const firstSrc = drawFromHeroPool();
+    const preload = new Image();
+    preload.onload = () => {
+    const firstSlide = createHeroSlide(firstSrc);
+    sliderEl.appendChild(firstSlide);
+
+    const l1 = firstSlide.querySelectorAll('.hb-layer1');
+    const l2 = firstSlide.querySelectorAll('.hb-layer2');
+    const l3 = firstSlide.querySelectorAll('.hb-layer3');
+    gsap.set([l1, l2, l3], { scaleY: 0, transformOrigin: 'bottom center' });
+    gsap.to(l3, { scaleY: 1, duration: 0.6, ease: 'power3.out', stagger: 0.06, delay: 0.2 });
+    gsap.to(l2, { scaleY: 1, duration: 0.6, ease: 'power3.out', stagger: 0.06, delay: 0.5 });
+    gsap.to(l1, { scaleY: 1, duration: 0.6, ease: 'power3.out', stagger: 0.06, delay: 0.8 });
+    heroAutoplay = setInterval(() => {
+        if (!heroAnimating) heroTransition(drawFromHeroPool());
+    }, HERO_INTERVAL_MS);
+    };
+    preload.src = firstSrc;
+  });
+}
+
+// ── SERVICIOS / TABS ─────────────────────────────────────────
+function initServiceTabs() {
+  const buttons = document.querySelectorAll('.service-btn');
+  const panels  = document.querySelectorAll('.portfolio-panel__content');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.service;
+
+      buttons.forEach(b => b.classList.remove('service-btn--active'));
+      btn.classList.add('service-btn--active');
+
+      panels.forEach(panel => {
+        if (panel.dataset.panel === target) {
+          panel.classList.remove('portfolio-panel__content--hidden');
+        } else {
+          panel.classList.add('portfolio-panel__content--hidden');
+        }
+      });
+    });
+  });
+}
+
+// ── HEADER: color logo según sección ─────────────────────────
+function initHeaderTheme() {
+  const header = document.querySelector('.site-header');
+  const darkSections = ['#servicios', '#portafolio'];
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = '#' + entry.target.id;
+        if (darkSections.includes(id)) {
+          header.classList.add('site-header--dark');
+          header.classList.remove('site-header--light');
+        } else {
+          header.classList.add('site-header--light');
+          header.classList.remove('site-header--dark');
+        }
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('main > section').forEach(s => observer.observe(s));
+}
+
+// ── Init ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initHero();
-  initProjects();
+  initServiceTabs();
+  initHeaderTheme();
 });
