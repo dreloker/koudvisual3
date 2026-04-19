@@ -40,85 +40,97 @@
       </div>
     </section>
 
-    <!-- ========== ABOUT + SERVICIOS ========== -->
+    <!-- ========== ABOUT ========== -->
     <section id="servicios" class="about">
-      <div class="about__question">
-        <h2 class="about__title">¿Qué hago?</h2>
-      </div>
-      <div class="about__services">
-        <button class="service-btn service-btn--active" data-service="branding">
-          <span class="service-btn__name">Branding</span>
-          <span class="service-btn__desc">Identidades visuales desde su base conceptual hasta su aplicación.</span>
-        </button>
-        <button class="service-btn" data-service="web">
-          <span class="service-btn__name">Diseño y desarrollo web</span>
-          <span class="service-btn__desc">Sitios web enfocados en claridad, estructura y uso real.</span>
-        </button>
-      </div>
-    </section>
 
-    <!-- ========== PORTAFOLIO / PANEL ========== -->
-    <section id="portafolio" class="portfolio-panel">
+      <!-- Franja: chevron scroll indicator -->
+      <div class="about__scroll-hint" id="scroll-hint">
+        <img src="img/cheuron.svg" class="about__chevron" id="chevron" alt="scroll" />
+      </div>
 
-      <div class="portfolio-panel__content" data-panel="branding">
-        <div class="portfolio-panel__body">
-          <p class="portfolio-panel__description">
-            Desarrollo identidades visuales completas: naming, logotipo, paleta, tipografía y sistema de aplicación. El resultado es una marca coherente que funciona en cualquier soporte.
-          </p>
-          <div class="portfolio-panel__method">
-            <h4 class="portfolio-panel__method-title">Metodología</h4>
-            <ol class="portfolio-panel__steps">
-              <li>Diagnóstico y brief</li>
-              <li>Investigación y referentes</li>
-              <li>Propuesta conceptual</li>
-              <li>Desarrollo visual</li>
-              <li>Entrega y manual de marca</li>
-            </ol>
+      <!-- Franja: título + marquee -->
+      <div class="about__header-row">
+        <div class="about__title-cell">
+          <h2 class="about__title">¿Qué hago?</h2>
+        </div>
+        <div class="about__marquee-cell">
+          <div class="marquee">
+            <span class="marquee__track" id="marquee-track">
+              ESTRUCTURA <span class="marquee__dot">•</span>
+              CLARIDAD <span class="marquee__dot">•</span>
+              COHERENCIA <span class="marquee__dot">•</span>
+              ESTRUCTURA <span class="marquee__dot">•</span>
+              CLARIDAD <span class="marquee__dot">•</span>
+              COHERENCIA <span class="marquee__dot">•</span>
+            </span>
           </div>
         </div>
-        <div class="portfolio-panel__actions">
-          <a href="#" class="portfolio-panel__link">Ver portafolio de branding →</a>
-          <a href="#contacto" class="portfolio-panel__cta">Hablemos de tu proyecto</a>
-        </div>
       </div>
 
-      <div class="portfolio-panel__content portfolio-panel__content--hidden" data-panel="web">
-        <div class="portfolio-panel__body">
-          <p class="portfolio-panel__description">
-            Diseño y construyo sitios web desde wireframe hasta producción. Trabajo con HTML, CSS y JavaScript, priorizando rendimiento, legibilidad del código y una experiencia de usuario clara.
-          </p>
-          <div class="portfolio-panel__method">
-            <h4 class="portfolio-panel__method-title">Metodología</h4>
-            <ol class="portfolio-panel__steps">
-              <li>Definición de objetivos y estructura</li>
-              <li>Wireframe y arquitectura de contenido</li>
-              <li>Diseño visual</li>
-              <li>Desarrollo e integración</li>
-              <li>Pruebas y publicación</li>
-            </ol>
+      <!-- Franja: servicios + panel descripción -->
+      <div class="about__services-row">
+        <div class="about__services-col">
+          <button class="service-btn service-btn--active" data-service="web">
+            <span class="service-btn__name">Diseño web</span>
+          </button>
+          <button class="service-btn" data-service="branding">
+            <span class="service-btn__name">Branding</span>
+          </button>
+          <button class="service-btn" data-service="ilustracion">
+            <span class="service-btn__name">Ilustración</span>
+          </button>
+        </div>
+        <div class="about__panel-col">
+          <div class="service-panel" data-panel="web">
+            <p class="service-panel__desc">Diseño y construyo sitios web desde wireframe hasta producción. Trabajo con HTML, CSS y JavaScript, priorizando rendimiento, legibilidad del código y una experiencia de usuario clara.</p>
+            <div class="service-panel__method">
+              <h4 class="service-panel__method-title">Metodología</h4>
+              <ol class="service-panel__steps">
+                <li>Definición de objetivos y estructura</li>
+                <li>Wireframe y arquitectura de contenido</li>
+                <li>Diseño visual</li>
+                <li>Desarrollo e integración</li>
+                <li>Pruebas y publicación</li>
+              </ol>
+            </div>
+            <div class="service-panel__actions">
+              <a href="#" class="service-panel__link">Ver portafolio web →</a>
+              <a href="#contacto" class="service-panel__cta">Hablemos de tu proyecto</a>
+            </div>
+          </div>
+          <div class="service-panel service-panel--hidden" data-panel="branding">
+            <p class="service-panel__desc">Desarrollo identidades visuales completas: naming, logotipo, paleta, tipografía y sistema de aplicación. El resultado es una marca coherente que funciona en cualquier soporte.</p>
+            <div class="service-panel__method">
+              <h4 class="service-panel__method-title">Metodología</h4>
+              <ol class="service-panel__steps">
+                <li>Diagnóstico y brief</li>
+                <li>Investigación y referentes</li>
+                <li>Propuesta conceptual</li>
+                <li>Desarrollo visual</li>
+                <li>Entrega y manual de marca</li>
+              </ol>
+            </div>
+            <div class="service-panel__actions">
+              <a href="#" class="service-panel__link">Ver portafolio de branding →</a>
+              <a href="#contacto" class="service-panel__cta">Hablemos de tu proyecto</a>
+            </div>
+          </div>
+          <div class="service-panel service-panel--hidden" data-panel="ilustracion">
+            <p class="service-panel__desc">— Contenido próximamente —</p>
+            <div class="service-panel__actions">
+              <a href="#contacto" class="service-panel__cta">Hablemos de tu proyecto</a>
+            </div>
           </div>
         </div>
-        <div class="portfolio-panel__actions">
-          <a href="#" class="portfolio-panel__link">Ver portafolio web →</a>
-          <a href="#contacto" class="portfolio-panel__cta">Hablemos de tu proyecto</a>
-        </div>
       </div>
 
-    </section>
-
-    <!-- ========== CTA ========== -->
-    <section id="contacto" class="cta">
-      <p class="cta__text">
-        Si tienes un proyecto o necesitas apoyo en diseño, puedes escribirme.
-      </p>
-      <a href="mailto:hola@koud.com" class="cta__button">Contactémonos</a>
     </section>
 
   </main>
 
   <!-- ========== FOOTER ========== -->
-  <footer class="site-footer">
-    <p class="site-footer__copy">&copy; 2025 Koud. Todos los derechos reservados.</p>
+  <footer class="site-footer" id="contacto">
+    <a href="mailto:hola@koud.com" class="site-footer__contact">Contactémonos</a>
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
