@@ -69,12 +69,8 @@ h1, h2 {
 .site-header__logo svg {
   height: 2.5rem;
   width: auto;
-  fill: var(--negros);
-  transition: fill 0.3s ease;
+  fill: var(--blancos);
 }
-
-.site-header--dark .site-header__logo svg { fill: white; }
-.site-header--light .site-header__logo svg { fill: black; }
 
 .site-header__nav {
   background-color: var(--negros);
@@ -177,6 +173,7 @@ h1, h2 {
   width: 50%;
   text-align: center;
   color: var(--blancos);
+  background-color: var(--negros);
   mix-blend-mode: difference;
 }
 
@@ -233,12 +230,13 @@ h1, h2 {
   width: 50%;
   display: flex;
   align-items: center;
+  justify-content: end;
   padding: 0 5%;
   border-right: 1px solid var(--secundario);
 }
 
 .about__title {
-  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  font-size: clamp(1.4rem, 7vw, 5rem);
 }
 
 .about__marquee-cell {
@@ -292,13 +290,14 @@ h1, h2 {
 .service-btn {
   display: flex;
   align-items: center;
+  justify-content: end;
   flex: 1;
   background: none;
   border: none;
   border-bottom: 1px solid var(--secundario);
   color: var(--secundario);
   cursor: pointer;
-  padding: 0 5%;
+  padding: 0 10%;
   text-align: left;
   transition: color 0.25s ease, background-color 0.25s ease;
 }

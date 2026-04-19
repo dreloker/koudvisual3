@@ -252,7 +252,7 @@ function initFooterGlow() {
 
   const PRIMARIO   = '#0cf095';
   const SECUNDARIO = '#6a6684';
-  const OSCURO     = '#2e2b45';
+  const OSCURO     = '#000000';
 
   let curX = 50, curY = 50;
   let tarX = 50, tarY = 50;
