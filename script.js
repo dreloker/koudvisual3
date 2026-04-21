@@ -146,12 +146,10 @@ function initHero() {
 
 // ── SCROLL AL INICIO al cargar o al navegar a #inicio ────────
 function initScrollToTop() {
-  // Siempre al cargar, fuerza scroll al top sin animación
   if (window.location.hash === '' || window.location.hash === '#inicio') {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
-  // Links que apuntan a #inicio o a /
   document.querySelectorAll('a[href="#inicio"], a[href="/"]').forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
@@ -161,88 +159,95 @@ function initScrollToTop() {
   });
 }
 
-// ── SCROLL SNAP solo en el hero ──────────────────────────────
-function initHeroScroll() {
-  const hero     = document.getElementById('inicio');
-  const servicios = document.getElementById('servicios');
-  if (!hero || !servicios) return;
-
-  let isInHero  = true;
-  let cooldown  = false;
-  const COOLDOWN_MS = 900;
-
-  // Detectar si el usuario está en el hero
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => { isInHero = entry.isIntersecting; });
-  }, { threshold: 0.5 });
-  observer.observe(hero);
-
-  function scrollToSection(el) {
-    el.scrollIntoView({ behavior: 'smooth' });
-    cooldown = true;
-    setTimeout(() => { cooldown = false; }, COOLDOWN_MS);
-  }
-
-  window.addEventListener('wheel', (e) => {
-    if (!isInHero || cooldown) return;
-    e.preventDefault();
-
-    if (e.deltaY > 0) {
-      // scroll abajo → ir a servicios
-      scrollToSection(servicios);
-    } else {
-      // scroll arriba → ya estás en hero, ir al top por si acaso
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      cooldown = true;
-      setTimeout(() => { cooldown = false; }, COOLDOWN_MS);
-    }
-  }, { passive: false });
-
-  // Touch (móvil)
-  let touchStartY = 0;
-  window.addEventListener('touchstart', (e) => {
-    touchStartY = e.touches[0].clientY;
-  }, { passive: true });
-
-  window.addEventListener('touchend', (e) => {
-    if (!isInHero || cooldown) return;
-    const delta = touchStartY - e.changedTouches[0].clientY;
-    if (Math.abs(delta) < 30) return; // ignorar swipes muy cortos
-    if (delta > 0) {
-      scrollToSection(servicios);
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      cooldown = true;
-      setTimeout(() => { cooldown = false; }, COOLDOWN_MS);
-    }
-  }, { passive: true });
-}
-
 // ── CHEVRON: click lleva a servicios + ocultar al salir hero ─
 function initScrollHint() {
-  const chevron  = document.getElementById('chevron');
-  const hint     = document.getElementById('scroll-hint');
-  const hero     = document.getElementById('inicio');
+  const chevron   = document.getElementById('chevron');
+  const hint      = document.getElementById('scroll-hint');
+  const hero      = document.getElementById('inicio');
   const servicios = document.getElementById('servicios');
   if (!chevron || !hero || !servicios) return;
 
-  // Click en el contenedor del chevron → ir a servicios
   hint.addEventListener('click', () => {
     servicios.scrollIntoView({ behavior: 'smooth' });
   });
 
-  // Ocultar/mostrar el chevron según si el hero es visible
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        chevron.classList.remove('is-hidden');
-      } else {
-        chevron.classList.add('is-hidden');
-      }
+      chevron.classList.toggle('is-hidden', !entry.isIntersecting);
     });
   }, { threshold: 0.1 });
 
   observer.observe(hero);
+}
+
+// ── ENTRADA animada izquierda → derecha ──────────────────────
+function initParallax() {
+  const X_START = -90;
+
+  const onLoad = [
+    { sel: '.about__scroll-hint',   dur: 1.2, blur: 12, delay: 0.1  },
+    { sel: '.about__title-cell',    dur: 1.8, blur: 16, delay: 0.35 },
+    { sel: '.about__marquee-cell',  dur: 2.4, blur: 20, delay: 0.6  },
+  ];
+
+  const onScroll = [
+    { sel: '.service-btn:nth-child(1)', dur: 1.4, blur: 12, delay: 0.0  },
+    { sel: '.service-btn:nth-child(2)', dur: 2.0, blur: 18, delay: 0.25 },
+    { sel: '.service-btn:nth-child(3)', dur: 2.8, blur: 24, delay: 0.5  },
+    { sel: '.about__panel-col',         dur: 2.2, blur: 20, delay: 0.15 },
+  ];
+
+  function prepare(defs) {
+    return defs.map(d => ({ ...d, el: document.querySelector(d.sel) }))
+               .filter(d => d.el);
+  }
+
+  function reset(defs) {
+    defs.forEach(({ el, blur }) => {
+      gsap.killTweensOf(el);
+      gsap.set(el, { opacity: 0, x: X_START, filter: `blur(${blur}px)` });
+    });
+  }
+
+  function animate(defs) {
+    defs.forEach(({ el, dur, blur, delay }) => {
+      gsap.killTweensOf(el);
+      gsap.set(el, { opacity: 0, x: X_START, filter: `blur(${blur}px)` });
+      gsap.to(el, {
+        opacity: 1, x: 0, filter: 'blur(0px)',
+        duration: dur, delay, ease: 'power3.out',
+      });
+    });
+  }
+
+  const loadDefs   = prepare(onLoad);
+  const scrollDefs = prepare(onScroll);
+
+  // Estado inicial de todos
+  reset(loadDefs);
+  reset(scrollDefs);
+
+  // onLoad: animar al entrar el scroll-hint, resetear al salir
+  const scrollHint = document.querySelector('.about__scroll-hint');
+  if (scrollHint) {
+    new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) animate(loadDefs);
+        else reset(loadDefs);
+      });
+    }, { threshold: 0.1 }).observe(scrollHint);
+  }
+
+  // onScroll: animar al entrar services-row, resetear al salir
+  const servicesRow = document.querySelector('.about__services-row');
+  if (servicesRow) {
+    new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) animate(scrollDefs);
+        else reset(scrollDefs);
+      });
+    }, { threshold: 0.1 }).observe(servicesRow);
+  }
 }
 
 // ── FOOTER: gradiente mesh que sigue al cursor global ────────
@@ -258,7 +263,6 @@ function initFooterGlow() {
   let tarX = 50, tarY = 50;
   const LERP = 0.027;
 
-  // Cursor global: convierte coordenadas absolutas a % relativo al footer
   window.addEventListener('mousemove', (e) => {
     const rect = footer.getBoundingClientRect();
     tarX = ((e.clientX - rect.left) / rect.width)  * 100;
@@ -269,8 +273,8 @@ function initFooterGlow() {
     curX += (tarX - curX) * LERP;
     curY += (tarY - curY) * LERP;
 
-    const r1 = window.innerWidth * 0.7; // radio primario: 50vw de diámetro → 25vw de radio
-    const r2 = window.innerWidth * 0.9; // radio secundario un poco mayor
+    const r1 = window.innerWidth * 0.7;
+    const r2 = window.innerWidth * 0.9;
 
     footer.style.backgroundImage = `
       radial-gradient(ellipse ${r1}px ${r1}px at ${curX}% ${curY}%, ${PRIMARIO}99 0%, transparent 100%),
@@ -322,12 +326,35 @@ function initServiceTabs() {
   startAutoRotate();
 }
 
+// ── HEADER: color logo según sección ────────────────────────
+function initHeaderTheme() {
+  const header       = document.querySelector('.site-header');
+  const darkSections = ['#servicios'];
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = '#' + entry.target.id;
+        if (darkSections.includes(id)) {
+          header.classList.add('site-header--dark');
+          header.classList.remove('site-header--light');
+        } else {
+          header.classList.add('site-header--light');
+          header.classList.remove('site-header--dark');
+        }
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('main > section').forEach(s => observer.observe(s));
+}
+
 // ── Init ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initScrollToTop();
   initHero();
-  initHeroScroll();
   initScrollHint();
+  initParallax();
   initFooterGlow();
   initServiceTabs();
   initHeaderTheme();
