@@ -7,9 +7,9 @@ const BLOCK_COUNT = 60;
 
 // ── Configuración animación hero ─────────────────────────────
 const CFG = {
-  blurAmountIn:  12,
-  blurAmount:    27,
-  heroInterval:  7000,
+  blurAmountIn:  17,
+  blurAmount:    77,
+  heroInterval:  10000,
   inL3Duration:  0.6,  inL3Delay: 0.2,  inL3Stagger: 0.06,
   inL2Duration:  0.6,  inL2Delay: 0.5,  inL2Stagger: 0.06,
   inL1Duration:  0.9,  inL1Delay: 0.8,  inL1Stagger: 0.06,
@@ -143,22 +143,6 @@ function initHero() {
     preload.src = firstSrc;
   });
 }
-
-// ── SCROLL AL INICIO al cargar o al navegar a #inicio ────────
-function initScrollToTop() {
-  if (window.location.hash === '' || window.location.hash === '#inicio') {
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }
-
-  document.querySelectorAll('a[href="#inicio"], a[href="/"]').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      history.pushState(null, '', '/');
-    });
-  });
-}
-
 // ── CHEVRON: click lleva a servicios + ocultar al salir hero ─
 function initScrollHint() {
   const chevron   = document.getElementById('chevron');
@@ -180,74 +164,84 @@ function initScrollHint() {
   observer.observe(hero);
 }
 
-// ── ENTRADA animada izquierda → derecha ──────────────────────
-function initParallax() {
-  const X_START = -90;
+// ── EFECTOKOUD ────────────────────────────────────────────────
+  const KOUD_SPEEDS = {
+    vel1: 5.0,
+    vel2: 4.0,
+    vel3: 3.0,
+    vel4: 2.0,
+    vel5: 1.0,
+  };
 
-  const onLoad = [
-    { sel: '.about__scroll-hint',   dur: 1.2, blur: 12, delay: 0.1  },
-    { sel: '.about__title-cell',    dur: 1.8, blur: 16, delay: 0.35 },
-    { sel: '.about__marquee-cell',  dur: 2.4, blur: 20, delay: 0.6  },
-  ];
+  const KOUD_BLUR_DURATION = {
+    vel1: 3.0,
+    vel2: 2.3,
+    vel3: 1.5,
+    vel4: 0.9,
+    vel5: 0.3,
+  };
 
-  const onScroll = [
-    { sel: '.service-btn:nth-child(1)', dur: 1.4, blur: 12, delay: 0.0  },
-    { sel: '.service-btn:nth-child(2)', dur: 2.0, blur: 18, delay: 0.25 },
-    { sel: '.service-btn:nth-child(3)', dur: 2.8, blur: 24, delay: 0.5  },
-    { sel: '.about__panel-col',         dur: 2.2, blur: 20, delay: 0.15 },
-  ];
+  const KOUD_EASE = 'cubic-bezier(0.3, 0, 0.03, 1.7)';
 
-  function prepare(defs) {
-    return defs.map(d => ({ ...d, el: document.querySelector(d.sel) }))
-               .filter(d => d.el);
-  }
-
-  function reset(defs) {
-    defs.forEach(({ el, blur }) => {
-      gsap.killTweensOf(el);
-      gsap.set(el, { opacity: 0, x: X_START, filter: `blur(${blur}px)` });
-    });
-  }
-
-  function animate(defs) {
-    defs.forEach(({ el, dur, blur, delay }) => {
-      gsap.killTweensOf(el);
-      gsap.set(el, { opacity: 0, x: X_START, filter: `blur(${blur}px)` });
-      gsap.to(el, {
-        opacity: 1, x: 0, filter: 'blur(0px)',
-        duration: dur, delay, ease: 'power3.out',
-      });
-    });
-  }
-
-  const loadDefs   = prepare(onLoad);
-  const scrollDefs = prepare(onScroll);
-
-  // Estado inicial de todos
-  reset(loadDefs);
-  reset(scrollDefs);
-
-  // onLoad: animar al entrar el scroll-hint, resetear al salir
-  const scrollHint = document.querySelector('.about__scroll-hint');
-  if (scrollHint) {
-    new IntersectionObserver((entries) => {
+  function initEfectoKoud() {
+    const observer = new IntersectionObserver((entries, obs) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) animate(loadDefs);
-        else reset(loadDefs);
+        if (!entry.isIntersecting) return;
+
+        const el = entry.target;
+        obs.unobserve(el);
+
+        const velKey = Object.keys(KOUD_SPEEDS).find(k => el.classList.contains(`efectokoud_${k}`));
+        const duration     = velKey ? KOUD_SPEEDS[velKey]        : KOUD_SPEEDS.vel3;
+        const blurDuration = velKey ? KOUD_BLUR_DURATION[velKey] : KOUD_BLUR_DURATION.vel3;
+
+        gsap.set(el, { x: '-30vw' });
+
+        const tl = gsap.timeline();
+        tl.to(el, { x: 0, duration, ease: KOUD_EASE }, 0);
+        tl.to(el, { filter: 'blur(0px)', duration: blurDuration, ease: KOUD_EASE }, 0);
       });
-    }, { threshold: 0.1 }).observe(scrollHint);
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('[class*="efectokoud_"]').forEach(el => observer.observe(el));
   }
 
-  // onScroll: animar al entrar services-row, resetear al salir
-  const servicesRow = document.querySelector('.about__services-row');
-  if (servicesRow) {
-    new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) animate(scrollDefs);
-        else reset(scrollDefs);
-      });
-    }, { threshold: 0.1 }).observe(servicesRow);
+// ── SERVICIOS / TABS con autorotación ────────────────────────
+function initServiceTabs() {
+  const buttons  = document.querySelectorAll('.service-btn');
+  const panels   = document.querySelectorAll('.service-panel');
+  const services = ['web', 'branding', 'ilustracion', 'producciongrafica'];
+  let current    = 0;
+  let autoRotate = null;
+
+  function showService(key) {
+    buttons.forEach(b => b.classList.toggle('service-btn--active', b.dataset.service === key));
+    panels.forEach(p => p.classList.toggle('service-panel--hidden', p.dataset.panel !== key));
   }
+
+  function nextService() {
+    current = (current + 1) % services.length;
+    showService(services[current]);
+  }
+
+  function startAutoRotate() {
+    autoRotate = setInterval(nextService, 3000);
+  }
+
+  function stopAutoRotate() {
+    clearInterval(autoRotate);
+    autoRotate = null;
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      stopAutoRotate();
+      current = services.indexOf(btn.dataset.service);
+      showService(btn.dataset.service);
+    });
+  });
+
+  startAutoRotate();
 }
 
 // ── FOOTER: gradiente mesh que sigue al cursor global ────────
@@ -288,74 +282,13 @@ function initFooterGlow() {
   requestAnimationFrame(updateGradient);
 }
 
-// ── SERVICIOS / TABS con autorotación ────────────────────────
-function initServiceTabs() {
-  const buttons  = document.querySelectorAll('.service-btn');
-  const panels   = document.querySelectorAll('.service-panel');
-  const services = ['web', 'branding', 'ilustracion'];
-  let current    = 0;
-  let autoRotate = null;
-
-  function showService(key) {
-    buttons.forEach(b => b.classList.toggle('service-btn--active', b.dataset.service === key));
-    panels.forEach(p => p.classList.toggle('service-panel--hidden', p.dataset.panel !== key));
-  }
-
-  function nextService() {
-    current = (current + 1) % services.length;
-    showService(services[current]);
-  }
-
-  function startAutoRotate() {
-    autoRotate = setInterval(nextService, 3000);
-  }
-
-  function stopAutoRotate() {
-    clearInterval(autoRotate);
-    autoRotate = null;
-  }
-
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      stopAutoRotate();
-      current = services.indexOf(btn.dataset.service);
-      showService(btn.dataset.service);
-    });
-  });
-
-  startAutoRotate();
-}
-
-// ── HEADER: color logo según sección ────────────────────────
-function initHeaderTheme() {
-  const header       = document.querySelector('.site-header');
-  const darkSections = ['#servicios'];
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = '#' + entry.target.id;
-        if (darkSections.includes(id)) {
-          header.classList.add('site-header--dark');
-          header.classList.remove('site-header--light');
-        } else {
-          header.classList.add('site-header--light');
-          header.classList.remove('site-header--dark');
-        }
-      }
-    });
-  }, { threshold: 0.3 });
-
-  document.querySelectorAll('main > section').forEach(s => observer.observe(s));
-}
 
 // ── Init ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  initScrollToTop();
   initHero();
   initScrollHint();
-  initParallax();
-  initFooterGlow();
+  initEfectoKoud(); // ← aquí
   initServiceTabs();
-  initHeaderTheme();
+  initFooterGlow();
+
 });
