@@ -8,14 +8,14 @@ const BLOCK_COUNT = 60;
 // ── Configuración animación hero ─────────────────────────────
 const CFG = {
   blurAmountIn:  17,
-  blurAmount:    77,
+  blurAmount:    37,
   heroInterval:  10000,
   inL3Duration:  0.6,  inL3Delay: 0.2,  inL3Stagger: 0.06,
-  inL2Duration:  0.6,  inL2Delay: 0.5,  inL2Stagger: 0.06,
-  inL1Duration:  0.9,  inL1Delay: 0.8,  inL1Stagger: 0.06,
-  outL1Duration: 0.5,  outL1Delay: 0.0, outL1Stagger: 0.06,
-  outL2Duration: 0.7,  outL2Delay: 0.2, outL2Stagger: 0.04,
-  outL3Duration: 0.6,  outL3Delay: 0.5, outL3Stagger: 0.05,
+  inL2Duration:  0.75,  inL2Delay: 0.27,  inL2Stagger: 0.06,
+  inL1Duration:  0.9,  inL1Delay: 0.57,  inL1Stagger: 0.06,
+  outL1Duration: 0.6,  outL1Delay: 0.0, outL1Stagger: 0.06,
+  outL2Duration: 0.9,  outL2Delay: 0.2, outL2Stagger: 0.05,
+  outL3Duration: 0.75,  outL3Delay: 0.4, outL3Stagger: 0.05,
 };
 
 // ── Utilidades ───────────────────────────────────────────────
@@ -53,12 +53,12 @@ function createHeroSlide(imageSrc) {
 
     const l3 = document.createElement('div');
     l3.className = 'hb-layer3';
-    l3.style.cssText = `position:absolute;top:0;left:${left}px;width:${blockW}px;height:100%;background:#000;z-index:1;`;
+    l3.style.cssText = `position:absolute;top:0;left:${left}px;width:${blockW}px;height:100%;background:#0cf095;z-index:1;`;
     slide.appendChild(l3);
 
     const l2 = document.createElement('div');
     l2.className = 'hb-layer2';
-    l2.style.cssText = `position:absolute;top:0;left:${left}px;width:${blockW}px;height:100%;background:#0cf095;z-index:2;`;
+    l2.style.cssText = `position:absolute;top:0;left:${left}px;width:${blockW}px;height:100%;background:#6a6684;z-index:2;`;
     slide.appendChild(l2);
 
     const l1 = document.createElement('div');
@@ -71,7 +71,7 @@ function createHeroSlide(imageSrc) {
     l1.appendChild(img);
     slide.appendChild(l1);
   }
-
+ 
   return slide;
 }
 
@@ -143,6 +143,123 @@ function initHero() {
     preload.src = firstSrc;
   });
 }
+
+// ── EFECTOFRANJA ─────────────────────────────────────────────
+const FRANJA_CFG = {
+  blockCount: 27,
+  colorL3: '#0cf095',
+  colorL2: '#6a6684',
+  colorL1: '#000000',
+  blurIn: 17,
+
+  vel1: { inL3D:0.6, inL3Delay:0.2, inL3S:0.06, inL2D:0.6, inL2Delay:0.5, inL2S:0.06, inL1D:0.9, inL1Delay:0.8, inL1S:0.06 },
+  vel2: { inL3D:0.5, inL3Delay:0.1, inL3S:0.05, inL2D:0.5, inL2Delay:0.4, inL2S:0.05, inL1D:0.7, inL1Delay:0.6, inL1S:0.05 },
+  vel3: { inL3D:0.4, inL3Delay:0.1, inL3S:0.04, inL2D:0.4, inL2Delay:0.3, inL2S:0.04, inL1D:0.6, inL1Delay:0.5, inL1S:0.04 },
+  vel4: { inL3D:0.3, inL3Delay:0.0, inL3S:0.03, inL2D:0.3, inL2Delay:0.2, inL2S:0.03, inL1D:0.4, inL1Delay:0.3, inL1S:0.03 },
+  vel5: { inL3D:0.2, inL3Delay:0.0, inL3S:0.02, inL2D:0.2, inL2Delay:0.1, inL2S:0.02, inL1D:0.3, inL1Delay:0.2, inL1S:0.02 },
+};
+
+function buildFranjaOverlay(el) {
+  const W      = el.offsetWidth;
+  const blockW = W / FRANJA_CFG.blockCount;
+
+  // Guardar overflow original y quitarlo temporalmente
+  el._overflowBefore = el.style.overflow;
+  el.style.overflow = 'visible';
+
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = `
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:999;
+    pointer-events:none;
+    overflow:hidden;
+  `;
+
+  for (let i = 0; i < FRANJA_CFG.blockCount; i++) {
+    const left = i * blockW;
+    const base = `position:absolute;top:0;left:${left}px;width:${blockW + 1}px;height:100%;`;
+
+    const l3 = document.createElement('div');
+    l3.className = 'ef-l3';
+    l3.style.cssText = base + `background:${FRANJA_CFG.colorL3};z-index:1;`;
+    wrapper.appendChild(l3);
+
+    const l2 = document.createElement('div');
+    l2.className = 'ef-l2';
+    l2.style.cssText = base + `background:${FRANJA_CFG.colorL2};z-index:2;`;
+    wrapper.appendChild(l2);
+
+    const l1 = document.createElement('div');
+    l1.className = 'ef-l1';
+    l1.style.cssText = base + `background:${FRANJA_CFG.colorL1};z-index:3;`;
+    wrapper.appendChild(l1);
+  }
+
+  el.style.position = 'relative';
+  el.appendChild(wrapper);
+  return wrapper;
+}
+
+function playFranjaIn(overlay, vcfg) {
+  const el  = overlay.parentElement;
+  const l3s = overlay.querySelectorAll('.ef-l3');
+  const l2s = overlay.querySelectorAll('.ef-l2');
+  const l1s = overlay.querySelectorAll('.ef-l1');
+  const blurIn = `blur(${FRANJA_CFG.blurIn}px)`;
+
+  gsap.set([l3s, l2s, l1s], {
+    scaleY: 0,
+    transformOrigin: 'bottom center',
+    filter: blurIn,
+  });
+
+  gsap.to(l3s, {
+    scaleY: 1, filter: 'blur(0px)',
+    duration: vcfg.inL3D, ease: 'power2.inOut',
+    stagger: vcfg.inL3S, delay: vcfg.inL3Delay,
+  });
+
+  gsap.to(l2s, {
+    scaleY: 1, filter: 'blur(0px)',
+    duration: vcfg.inL2D, ease: 'power2.inOut',
+    stagger: vcfg.inL2S, delay: vcfg.inL2Delay,
+  });
+
+  gsap.to(l1s, {
+    scaleY: 1, filter: 'blur(0px)',
+    duration: vcfg.inL1D, ease: 'power2.inOut',
+    stagger: vcfg.inL1S, delay: vcfg.inL1Delay,
+    onComplete: () => {
+      overlay.remove();
+      // Restaurar overflow original
+      el.style.overflow = el._overflowBefore || '';
+    },
+  });
+}
+
+function initEfectoFranja() {
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+
+      const el = entry.target;
+      obs.unobserve(el);
+
+      const velKey = ['vel1','vel2','vel3','vel4','vel5']
+        .find(k => el.classList.contains(`efectofranja_${k}`)) || 'vel3';
+      const vcfg = FRANJA_CFG[velKey];
+
+      const overlay = buildFranjaOverlay(el);
+      playFranjaIn(overlay, vcfg);
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('[class*="efectofranja_"]').forEach(el => observer.observe(el));
+}
+
 // ── CHEVRON: click lleva a servicios + ocultar al salir hero ─
 function initScrollHint() {
   const chevron   = document.getElementById('chevron');
@@ -195,10 +312,10 @@ function initScrollHint() {
         const duration     = velKey ? KOUD_SPEEDS[velKey]        : KOUD_SPEEDS.vel3;
         const blurDuration = velKey ? KOUD_BLUR_DURATION[velKey] : KOUD_BLUR_DURATION.vel3;
 
-        gsap.set(el, { x: '-30vw' });
+        gsap.set(el, { y: '30vw' });
 
         const tl = gsap.timeline();
-        tl.to(el, { x: 0, duration, ease: KOUD_EASE }, 0);
+        tl.to(el, { y: 0, duration, ease: KOUD_EASE }, 0);
         tl.to(el, { filter: 'blur(0px)', duration: blurDuration, ease: KOUD_EASE }, 0);
       });
     }, { threshold: 0.1 });
@@ -287,8 +404,8 @@ function initFooterGlow() {
 document.addEventListener('DOMContentLoaded', () => {
   initHero();
   initScrollHint();
-  initEfectoKoud(); // ← aquí
+  initEfectoKoud();
+  initEfectoFranja();
   initServiceTabs();
   initFooterGlow();
-
 });

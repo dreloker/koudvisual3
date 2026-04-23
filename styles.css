@@ -29,6 +29,11 @@ body {
   overflow-x: hidden;
 }
 
+main {
+  background: linear-gradient(-45deg,rgba(0, 0, 0, 1) 0%, rgb(106, 102, 132) 25%, rgba(255, 255, 255, 1) 75%);;
+  color: var(--blancos);
+}
+
 img {
   display: block;
   max-width: 100%;
@@ -53,6 +58,11 @@ h1, h2 {
 [class*="efectokoud"] {
   filter: blur(12px);
   will-change: filter, transform;
+}
+
+/* ── EfectoFranja ───────────────────────────────────────────── */
+[class*="efectofranja_"] {
+  position: relative;
 }
 
 /* ==========================================================
@@ -85,9 +95,8 @@ h1, h2 {
 }
 
 .site-header__nav {
-  position: relative;
-  width: 30%;
-  height: 40%;
+  width: 40%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,7 +105,7 @@ h1, h2 {
 .nav__list {
   display: flex;
   align-items: center;
-  height: 100%;
+  height: 40%;
   width: 100%;  
   background-color: var(--negros);
   border-radius: 999px;
@@ -138,11 +147,11 @@ h1, h2 {
 }
 
 .site-header__cta {
-  width: 40%;
+  width: 20%;
   height: 100%;
   display: flex;
   align-items: center;
-  padding-right: 10vw;
+  padding-left: 10vw;
   justify-content: end;
 }
 
@@ -155,7 +164,7 @@ h1, h2 {
   padding: 0.4rem 1.4rem;
   border-radius: 999px;
   white-space: nowrap;
-  width: 40%;
+  width: 100%;
   position: relative;
 }
 
@@ -167,6 +176,7 @@ h1, h2 {
 .hero {
   position: relative;
   height: 90vh;
+  width: 100vw;
   overflow: hidden;
 }
 
@@ -192,9 +202,10 @@ h1, h2 {
   inset: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   width: 100%;
+  z-index: 10;
   height: 100%;
-  z-index: 5;
 }
 
 .hero__heading {
@@ -202,9 +213,7 @@ h1, h2 {
   height: auto;
   background-color: var(--negros);
   color: var(--blancos);
-  position: relative;
   padding: 1vh 1.5vw 1vh 1.5vw;
-  left: 30%;
 }
 
 .hero__heading h1 {
@@ -236,7 +245,7 @@ h1, h2 {
    ========================================================== */
 
 .about {
-background: linear-gradient(0deg,rgba(0, 0, 0, 1) 0%, rgba(12, 240, 149, 1) 25%, rgba(255, 255, 255, 1) 75%);;
+  background: linear-gradient(45deg,rgba(0, 0, 0, 1) 0%, rgba(12, 240, 149, 1) 25%, rgba(255, 255, 255, 1) 75%);;
   color: var(--blancos);
 }
 
@@ -397,7 +406,9 @@ background: linear-gradient(0deg,rgba(0, 0, 0, 1) 0%, rgba(12, 240, 149, 1) 25%,
 
 .about__panel-col {
   background-color: var(--negros);
-  width: 50%;
+  width: 35vw;
+  border-right: 1px solid var(--gris);
+  z-index: 5;
   display: flex;
   flex-direction: column;
 }
@@ -502,6 +513,15 @@ background: linear-gradient(0deg,rgba(0, 0, 0, 1) 0%, rgba(12, 240, 149, 1) 25%,
   .about__marquee-cell { height: 10vh; }
   .about__services-col { min-height: 20vh; }
 }
+
+/* -- Panel descripción servicio -- */
+
+.about__services-img {
+  background-color: var(--negros);
+  width: 35vw;
+  height: 100%;
+}
+
 
 
 /* ==========================================================
