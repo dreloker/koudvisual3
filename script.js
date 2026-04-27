@@ -8,14 +8,14 @@ const BLOCK_COUNT = 60;
 // ── Configuración animación hero ─────────────────────────────
 const CFG = {
   blurAmountIn:  17,
-  blurAmount:    37,
-  heroInterval:  10000,
-  inL3Duration:  0.6,  inL3Delay: 0.2,  inL3Stagger: 0.06,
-  inL2Duration:  0.75,  inL2Delay: 0.27,  inL2Stagger: 0.06,
-  inL1Duration:  0.9,  inL1Delay: 0.57,  inL1Stagger: 0.06,
-  outL1Duration: 0.6,  outL1Delay: 0.0, outL1Stagger: 0.06,
-  outL2Duration: 0.9,  outL2Delay: 0.2, outL2Stagger: 0.05,
-  outL3Duration: 0.75,  outL3Delay: 0.4, outL3Stagger: 0.05,
+  blurAmount:    27,
+  heroInterval:  7000,
+  inL3Duration:  0.47,  inL3Delay: 0.0,  inL3Stagger: 0.06,
+  inL2Duration:  0.53,  inL2Delay: 0.07,  inL2Stagger: 0.06,
+  inL1Duration:  0.6,  inL1Delay: 0.27,  inL1Stagger: 0.06,
+  outL1Duration: 0.5,  outL1Delay: 0.0, outL1Stagger: 0.05,
+  outL2Duration: 0.33,  outL2Delay: 0.07, outL2Stagger: 0.051,
+  outL3Duration: 0.35,  outL3Delay: 0.12, outL3Stagger: 0.051,
 };
 
 // ── Utilidades ───────────────────────────────────────────────
@@ -146,17 +146,28 @@ function initHero() {
 
 // ── EFECTOFRANJA ─────────────────────────────────────────────
 const FRANJA_CFG = {
-  blockCount: 27,
+  blockCount: 60,
   colorL3: '#0cf095',
   colorL2: '#6a6684',
   colorL1: '#000000',
-  blurIn: 17,
+  blurIn: 12,
 
-  vel1: { inL3D:0.6, inL3Delay:0.2, inL3S:0.06, inL2D:0.6, inL2Delay:0.5, inL2S:0.06, inL1D:0.9, inL1Delay:0.8, inL1S:0.06 },
-  vel2: { inL3D:0.5, inL3Delay:0.1, inL3S:0.05, inL2D:0.5, inL2Delay:0.4, inL2S:0.05, inL1D:0.7, inL1Delay:0.6, inL1S:0.05 },
-  vel3: { inL3D:0.4, inL3Delay:0.1, inL3S:0.04, inL2D:0.4, inL2Delay:0.3, inL2S:0.04, inL1D:0.6, inL1Delay:0.5, inL1S:0.04 },
-  vel4: { inL3D:0.3, inL3Delay:0.0, inL3S:0.03, inL2D:0.3, inL2Delay:0.2, inL2S:0.03, inL1D:0.4, inL1Delay:0.3, inL1S:0.03 },
-  vel5: { inL3D:0.2, inL3Delay:0.0, inL3S:0.02, inL2D:0.2, inL2Delay:0.1, inL2S:0.02, inL1D:0.3, inL1Delay:0.2, inL1S:0.02 },
+  vel1: { inL3D:0.3, inL3Delay:0.0, inL3S:0.02, 
+          inL2D:0.40, inL2Delay:0.17, inL2S:0.02, 
+          inL1D:0.4, inL1Delay:0.37, inL1S:0.02 },
+  vel2: { inL3D:0.35, inL3Delay:0.1, inL3S:0.03,
+          inL2D:0.47, inL2Delay:0.285, inL2S:0.03,
+          inL1D:0.5, inL1Delay:0.6, inL1S:0.03 },
+  vel3: { inL3D:0.5, inL3Delay:0.0, inL3S:0.04, 
+          inL2D:0.55, inL2Delay:0.17, inL2S:0.04, 
+          inL1D:0.6, inL1Delay:0.37, inL1S:0.04 },
+  vel4: { inL3D:0.45, inL3Delay:0.1, inL3S:0.05, 
+          inL2D:0.63, inL2Delay:0.25, inL2S:0.05,
+          inL1D:0.7, inL1Delay:0.5, inL1S:0.05 },
+  vel5: { inL3D:0.6, inL3Delay:0.2, inL3S:0.09, 
+          inL2D:0.75, inL2Delay:0.3, inL2S:0.10, 
+          inL1D:0.9, inL1Delay:0.7, inL1S:0.11 },
+
 };
 
 function buildFranjaOverlay(el) {
@@ -283,22 +294,22 @@ function initScrollHint() {
 
 // ── EFECTOKOUD ────────────────────────────────────────────────
   const KOUD_SPEEDS = {
-    vel1: 5.0,
-    vel2: 4.0,
-    vel3: 3.0,
+    vel1: 7.0,
+    vel2: 5.5,
+    vel3: 3.7,
     vel4: 2.0,
-    vel5: 1.0,
+    vel5: 0.7,
   };
 
   const KOUD_BLUR_DURATION = {
-    vel1: 3.0,
-    vel2: 2.3,
-    vel3: 1.5,
-    vel4: 0.9,
-    vel5: 0.3,
+    vel1: 5.0,
+    vel2: 3.7,
+    vel3: 3.0,
+    vel4: 1.3,
+    vel5: 1.0,
   };
 
-  const KOUD_EASE = 'cubic-bezier(0.3, 0, 0.03, 1.7)';
+const KOUD_EASE = 'cubic-bezier(0.17, 0, 0.5, 0.5)';
 
   function initEfectoKoud() {
     const observer = new IntersectionObserver((entries, obs) => {
@@ -312,11 +323,12 @@ function initScrollHint() {
         const duration     = velKey ? KOUD_SPEEDS[velKey]        : KOUD_SPEEDS.vel3;
         const blurDuration = velKey ? KOUD_BLUR_DURATION[velKey] : KOUD_BLUR_DURATION.vel3;
 
-        gsap.set(el, { y: '30vw' });
+        gsap.set(el, { y: '2.7vw' });
 
         const tl = gsap.timeline();
         tl.to(el, { y: 0, duration, ease: KOUD_EASE }, 0);
         tl.to(el, { filter: 'blur(0px)', duration: blurDuration, ease: KOUD_EASE }, 0);
+        tl.to(el, { opacity: 1, duration: blurDuration, ease: KOUD_EASE }, 0);
       });
     }, { threshold: 0.1 });
 
